@@ -1,5 +1,14 @@
 (defpackage :lights-out
-  (:use :cl :lisp-unit))
+  (:use :cl :lisp-unit)
+  (:export
+   :lights-out
+   :light-on?
+   :toggle-light
+   :set-light
+   :rows
+   :columns
+   :lights
+   :won?))
 
 (in-package :lights-out)
 
@@ -18,11 +27,13 @@
           (make-array (list rows columns) :initial-element t))))
 
 (defmethod toggle-light ((x number) (y number) (g lights-out))
-  (set-toggle x y g)
-  (set-toggle (1- x) y g)
-  (set-toggle (1+ x) y g)
-  (set-toggle x (1- y) g)
-  (set-toggle x (1+ y) g))
+  (when (and (< x (rows g))
+             (< y (columns g)))
+   (set-toggle x y g)
+   (set-toggle (1- x) y g)
+   (set-toggle (1+ x) y g)
+   (set-toggle x (1- y) g)
+   (set-toggle x (1+ y) g)))
 
 (defmethod light-on? ((x number) (y number) (g lights-out))
   (aref (lights g) x y))
@@ -37,6 +48,14 @@
                (< x rows)
                (< y columns))
      (setf (aref lights x y) (not (aref lights x y))))))
+
+(defmethod won? ((g lights-out))
+  (with-slots (rows columns lights) g
+    (dotimes (x rows)
+      (dotimes (y columns)
+        (when (aref lights x y)
+          (return-from won? nil))))
+    t))
 
 (remove-tests :all)
 
@@ -68,6 +87,14 @@
     (assert-equal nil (light-on? 4 2 game))
     (assert-equal nil (light-on? 4 1 game))
     (assert-equal nil (light-on? 3 2 game))))
+
+(define-test lights-out-winning
+  (let ((g (make-instance 'lights-out :rows 2 :columns 1)))
+    (assert-false (won? g))
+    (set-light 0 0 g nil)
+    (assert-false (won? g))
+    (set-light 1 0 g nil)
+    (assert-true (won? g))))
 
 (let ((*print-failures* t)
       (*print-errors* t))
