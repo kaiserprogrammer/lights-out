@@ -19,7 +19,6 @@
       (princ-to-string name)))
 
 (defvar *field*)
-(defvar *game*)
 
 (defclass gui-field ()
   ((lights-mapping :accessor lights-mapping)
