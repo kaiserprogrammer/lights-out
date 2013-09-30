@@ -4,6 +4,20 @@
 
 (named-readtables:in-readtable :qt)
 
+;;; works only with compilation
+(defmacro relative-file (name)
+  (if (or *load-truename*
+          *compile-file-truename*)
+      (princ-to-string
+       (truename
+        (make-pathname
+         :name (eval name)
+         :directory
+         (pathname-directory
+          (or *load-truename*
+              *compile-file-truename*)))))
+      (princ-to-string name)))
+
 (defvar *field*)
 (defvar *game*)
 
@@ -39,17 +53,19 @@
 (defmethod toggle ((l light))
   (field-toggle *field* l))
 
+
+
 (defmethod initialize-instance :after ((l light) &rest rest)
   (declare (ignore rest))
   (new l)
   (#_setCheckable l t)
   (let ((icon (#_new QIcon)))
     (#_addPixmap icon
-                 (#_QPixmap::fromImage(#_new QImage "/home/coder/Pictures/cucon/AAlarm_1.jpg"))
+                 (#_QPixmap::fromImage(#_new QImage #.(relative-file "On.jpg")))
                  (#_QIcon::Active)
                  (#_QIcon::On))
     (#_addPixmap icon
-                 (#_QPixmap::fromImage(#_new QImage "/home/coder/Pictures/cucon/Inactive.jpg"))
+                 (#_QPixmap::fromImage(#_new QImage #.(relative-file "Off.jpg")))
                  (#_QIcon::Active)
                  (#_QIcon::Off))
     (#_setIcon l icon))
