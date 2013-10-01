@@ -2,4 +2,5 @@
 
 ## Play in REPL
 
-You can play it in the repl with (play-game rows columns)
+Compile the corresponding file and start the game with the
+corresponding function. There is a SDL, QT and Terminal version.
